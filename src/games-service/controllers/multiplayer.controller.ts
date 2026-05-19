@@ -19,7 +19,8 @@ export const createMultiplayerRoom = (req: Request, res: Response): void => {
 
 export const joinMultiplayerRoom = (req: Request, res: Response): void => {
   try {
-    const { code, usuarioId, nombre } = req.body;
+    const code = req.params.code as string;
+    const { usuarioId, nombre } = req.body;
     if (!code || !usuarioId || !nombre) {
       res.status(400).json({ error: 'Faltan campos obligatorios (code, usuarioId, nombre)' });
       return;

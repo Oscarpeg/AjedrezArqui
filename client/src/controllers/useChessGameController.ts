@@ -145,8 +145,23 @@ export function useChessGameController(
     setBoard(buildBoardFromChess(chess));
     setCurrentTurn(chess.turn() === 'w' ? 'white' : 'black');
     setMoves(chess.history().map((m, idx) => `${idx + 1}. ${m}`));
-    
-    // Detectar jaque
+
+    if (chess.isCheckmate()) {
+      const winner = chess.turn() === 'b' ? 'Blancas' : 'Negras';
+      saveToHistoryAndExit(`Jaque mate — ganan ${winner}`);
+      return;
+    }
+
+    if (chess.isDraw()) {
+      let reason = 'Tablas';
+      if (chess.isStalemate())            reason = 'Tablas — ahogado';
+      else if (chess.isThreefoldRepetition()) reason = 'Tablas — repetición';
+      else if (chess.isInsufficientMaterial()) reason = 'Tablas — material insuficiente';
+      saveToHistoryAndExit(reason);
+      return;
+    }
+
+    // Detectar jaque (solo si la partida sigue)
     if (chess.isCheck()) {
       const turn = chess.turn();
       let kingPos = { row: -1, col: -1 };
@@ -275,8 +290,7 @@ export function useChessGameController(
       return wsRef.current;
     }
 
-    console.log('Opening WebSocket connection to ws://localhost:3004/ws');
-    const ws = new WebSocket('ws://localhost:3004/ws');
+    const ws = new WebSocket(`ws://${window.location.hostname}:3004/ws`);
     wsRef.current = ws;
 
     ws.addEventListener('open', () => {

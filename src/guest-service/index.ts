@@ -8,7 +8,7 @@ const PORT = 3005;
 app.use(cors());
 app.use(express.json());
 
-app.use('/guest', guestRoutes);
+app.use('/guests', guestRoutes);
 
 app.listen(PORT, () => {
   console.log(`Guest Service running on port ${PORT}`);

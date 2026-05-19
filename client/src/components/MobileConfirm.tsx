@@ -18,13 +18,11 @@ function getLoggedInUser(): { userId: number; name: string } | null {
 
 export function MobileConfirm() {
   const [user, setUser] = useState<{ userId: number; name: string } | null>(null);
-  const [status, setStatus] = useState<"scanning" | "confirming" | "done" | "error" | "no_camera">("scanning");
+  const [status, setStatus] = useState<"login" | "scanning" | "confirming" | "done" | "error" | "no_camera">("scanning");
   const [error, setError] = useState("");
 
-  // Estado para usuario NO logueado
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [sessionId, setSessionId] = useState("");
   const [loading, setLoading] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -36,6 +34,7 @@ export function MobileConfirm() {
     const u = getLoggedInUser();
     setUser(u);
     if (u) startCamera();
+    else setStatus("login");
     return () => stopCamera();
   }, []);
 
@@ -86,10 +85,10 @@ export function MobileConfirm() {
     setStatus("confirming");
     setError("");
     try {
-      const res = await fetch(`${AUTH_SERVICE}/auth/qr/confirm`, {
-        method: "POST",
+      const res = await fetch(`${AUTH_SERVICE}/auth/qr/${sid}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: sid, userId }),
+        body: JSON.stringify({ userId }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -104,12 +103,12 @@ export function MobileConfirm() {
     }
   };
 
-  const handleLoginAndConfirm = async () => {
-    if (!email || !password || !sessionId.trim()) { setError("Completa todos los campos"); return; }
+  const handleLogin = async () => {
+    if (!email || !password) { setError("Completa todos los campos"); return; }
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${AUTH_SERVICE}/login`, {
+      const res = await fetch(`${AUTH_SERVICE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correoElectronico: email, contrasena: password }),
@@ -118,7 +117,10 @@ export function MobileConfirm() {
       if (!res.ok) { setError(data.error || "Credenciales inválidas"); setLoading(false); return; }
       localStorage.setItem("ajedrez_token", data.tokenJwt);
       localStorage.setItem("ajedrez_user", JSON.stringify({ name: data.nombreUsuario }));
-      await confirmSession(sessionId.trim(), data.usuarioId);
+      const u = { userId: data.usuarioId, name: data.nombreUsuario };
+      setUser(u);
+      setStatus("scanning");
+      startCamera();
     } catch {
       setError("Error de conexión");
     } finally {
@@ -170,6 +172,15 @@ export function MobileConfirm() {
         <p style={{ ...s.info, textAlign: "center", marginTop: "0.75rem", fontSize: "0.75rem" }}>
           Escaneando automáticamente...
         </p>
+        <button style={s.btnSecondary} onClick={() => {
+          stopCamera();
+          localStorage.removeItem("ajedrez_token");
+          localStorage.removeItem("ajedrez_user");
+          setUser(null);
+          setStatus("login");
+        }}>
+          Cambiar cuenta
+        </button>
       </div>
     </div>
   );
@@ -192,29 +203,35 @@ export function MobileConfirm() {
         >
           Autorizar
         </button>
+        <button style={s.btnSecondary} onClick={() => {
+          localStorage.removeItem("ajedrez_token");
+          localStorage.removeItem("ajedrez_user");
+          setUser(null);
+          setStatus("login");
+        }}>
+          Cambiar cuenta
+        </button>
       </div>
     </div>
   );
 
-  // ── Usuario NO logueado ────────────────────────────────────────────
+  // ── Usuario NO logueado — formulario de login ─────────────────────
   return (
     <div style={s.page}>
       <div style={s.card}>
         <h1 style={s.title}>&#9813; Vincular PC</h1>
-        <p style={s.info}>Inicia sesión en tu celular para vincular el PC.</p>
+        <p style={s.info}>Inicia sesión para escanear el QR de tu computadora.</p>
         {error && <p style={s.errorText}>{error}</p>}
         <label style={s.label}>Correo electrónico</label>
         <input style={s.input} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
         <label style={s.label}>Contraseña</label>
         <input style={s.input} type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
-        <label style={s.label}>Código del QR</label>
-        <input style={s.input} placeholder="Pega el código del QR" value={sessionId} onChange={e => setSessionId(e.target.value)} />
         <button
-          style={{ ...s.btn, opacity: (email && password && sessionId.trim() && !loading) ? 1 : 0.5 }}
-          disabled={!email || !password || !sessionId.trim() || loading}
-          onClick={handleLoginAndConfirm}
+          style={{ ...s.btn, opacity: (email && password && !loading) ? 1 : 0.5 }}
+          disabled={!email || !password || loading}
+          onClick={handleLogin}
         >
-          {loading ? "Autorizando..." : "Iniciar sesión y vincular"}
+          {loading ? "Ingresando..." : "Ingresar y escanear QR"}
         </button>
       </div>
     </div>
@@ -228,6 +245,7 @@ const s: Record<string, React.CSSProperties> = {
   label: { display: "block", color: "#cbd5e1", fontSize: "0.75rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.375rem" },
   input: { width: "100%", padding: "0.75rem 1rem", borderRadius: "0.5rem", background: "#0f172a", border: "1px solid #475569", color: "#f1f5f9", fontSize: "0.875rem", marginBottom: "0.75rem", outline: "none", boxSizing: "border-box" },
   btn: { width: "100%", padding: "0.875rem", borderRadius: "0.5rem", background: "#fbbf24", color: "#0f172a", fontWeight: 700, fontSize: "1rem", border: "none", cursor: "pointer", marginTop: "0.5rem" },
+  btnSecondary: { width: "100%", padding: "0.625rem", borderRadius: "0.5rem", background: "transparent", color: "#94a3b8", fontWeight: 500, fontSize: "0.875rem", border: "1px solid #334155", cursor: "pointer", marginTop: "0.75rem" },
   video: { width: "100%", borderRadius: "0.5rem", background: "#000", aspectRatio: "4/3" },
   info: { color: "#94a3b8", fontSize: "0.875rem", marginBottom: "0.75rem" },
   errorText: { background: "#450a0a", border: "1px solid #991b1b", color: "#fca5a5", padding: "0.75rem", borderRadius: "0.5rem", fontSize: "0.875rem", marginBottom: "1rem" },

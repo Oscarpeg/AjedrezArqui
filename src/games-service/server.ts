@@ -30,7 +30,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/games', gamesRoutes);
-app.use('/games/multiplayer', multiplayerRoutes);
+app.use('/games/rooms', multiplayerRoutes);
 
 // Internal Notification Endpoint for Auth Service
 app.post('/internal/auth-notify', (req, res) => {

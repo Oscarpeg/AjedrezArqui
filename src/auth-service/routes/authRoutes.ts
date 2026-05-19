@@ -3,10 +3,10 @@ import { loginUser, generateQr, confirmQr, mobileLoginPage, mobileLoginSubmit } 
 
 const router = Router();
 
-router.post('/login', loginUser);
-router.get('/auth/qr/generate', generateQr);
-router.post('/auth/qr/confirm', confirmQr);
-router.get('/mobile/login', mobileLoginPage);
-router.post('/mobile/login', mobileLoginSubmit);
+router.post('/auth/login', loginUser);
+router.post('/auth/qr', generateQr);
+router.patch('/auth/qr/:sessionId', confirmQr);
+router.get('/auth/mobile', mobileLoginPage);
+router.post('/auth/mobile', mobileLoginSubmit);
 
 export default router;

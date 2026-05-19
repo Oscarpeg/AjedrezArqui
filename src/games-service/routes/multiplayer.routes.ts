@@ -3,7 +3,7 @@ import { createMultiplayerRoom, joinMultiplayerRoom } from '../controllers/multi
 
 const router = Router();
 
-router.post('/create', createMultiplayerRoom);
-router.post('/join', joinMultiplayerRoom);
+router.post('/', createMultiplayerRoom);
+router.post('/:code/players', joinMultiplayerRoom);
 
 export default router;

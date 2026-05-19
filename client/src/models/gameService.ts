@@ -1,10 +1,10 @@
 import type { CreateRoomResponse, JoinRoomResponse, GameMode } from './entities/game.entity';
 
-const API_BASE = 'http://localhost:3004/games';
+const API_BASE = `http://${window.location.hostname}:3004/games`;
 
 export const gameService = {
   async createMultiplayerRoom(usuarioId: number, nombre: string): Promise<CreateRoomResponse> {
-    const response = await fetch(`${API_BASE}/multiplayer/create`, {
+    const response = await fetch(`${API_BASE}/rooms`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId, nombre })
@@ -16,10 +16,10 @@ export const gameService = {
   },
 
   async joinMultiplayerRoom(code: string, usuarioId: number, nombre: string): Promise<JoinRoomResponse> {
-    const response = await fetch(`${API_BASE}/multiplayer/join`, {
+    const response = await fetch(`${API_BASE}/rooms/${code}/players`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, usuarioId, nombre })
+      body: JSON.stringify({ usuarioId, nombre })
     });
     if (!response.ok) {
       throw new Error('No se pudo unir a la sala multiplayer');

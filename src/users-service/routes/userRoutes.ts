@@ -4,11 +4,11 @@ import { registerUser, getUserByEmail, getUserById, getRankingHandler, getUserSt
 const router = Router();
 
 // Public route
-router.post('/register', registerUser);
+router.post('/users', registerUser);
 
 // Internal routes (in a real app, these should be protected from public access)
 router.get('/internal/users/email/:email', getUserByEmail);
-router.post('/internal/users/upsert', upsertUser);
+router.put('/internal/users/by-email', upsertUser);
 router.get('/internal/users/:id', getUserById);
 
 // Ranking and Stats routes

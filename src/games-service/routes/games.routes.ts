@@ -6,6 +6,6 @@ const router = Router();
 router.post('/', createGame);
 router.get('/:partidaId', getGameById);
 router.get('/usuario/:usuarioId/activas', getActiveGamesByUser);
-router.post('/:partidaId/detener-simulacion', stopSimulationHandler);
+router.patch('/:partidaId', stopSimulationHandler);
 
 export default router;

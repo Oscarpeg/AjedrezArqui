@@ -37,7 +37,7 @@ export function LoginPlayer({ onBack, onLogin, onExternalLogin }: LoginPlayerPro
 
         const host = window.location.hostname;
         // 1. Fetch QR from Auth Service
-        const response = await fetch(`http://${host}:3002/auth/qr/generate`);
+        const response = await fetch(`http://${host}:3002/auth/qr`, { method: 'POST' });
         const data = await response.json();
         setQrCode(data.qrCodeDataUrl);
         setSessionId(data.sessionId);

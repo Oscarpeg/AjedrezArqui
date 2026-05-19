@@ -30,7 +30,7 @@ export function useAppController() {
 
   const handleRegister = async (name: string, password: string, email: string) => {
     try {
-      const response = await fetch(`${USERS_URL}/register`, {
+      const response = await fetch(`${USERS_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -60,7 +60,7 @@ export function useAppController() {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${AUTH_URL}/login`, {
+      const response = await fetch(`${AUTH_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

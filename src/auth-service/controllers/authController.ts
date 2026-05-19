@@ -25,7 +25,11 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
     const tokenJwt = jwt.sign({ usuarioId: user.usuarioId, correoElectronico: user.correoElectronico }, JWT_SECRET, { expiresIn: '8h' });
     res.json({ tokenJwt, usuarioId: user.usuarioId, nombreUsuario: user.nombreUsuario });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      res.status(401).json({ error: 'Credenciales inválidas' });
+      return;
+    }
     res.status(500).json({ error: 'Error del servidor' });
   }
 };
@@ -43,7 +47,8 @@ export const generateQr = async (req: Request, res: Response): Promise<void> => 
 };
 
 export const confirmQr = async (req: Request, res: Response): Promise<void> => {
-  const { sessionId, userId } = req.body;
+  const sessionId = req.params.sessionId as string;
+  const { userId } = req.body;
 
   const session = sessionManager.getSession(sessionId);
   if (!session || (session.status !== 'pending' && session.status !== 'scanned')) {
@@ -173,7 +178,7 @@ export const mobileLoginPage = (req: Request, res: Response): void => {
       };
 
       try {
-        const res = await fetch('/mobile/login', {
+        const res = await fetch('/auth/mobile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
