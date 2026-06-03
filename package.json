@@ -20,7 +20,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Oscarpeg",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
