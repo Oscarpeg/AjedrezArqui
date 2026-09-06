@@ -137,8 +137,13 @@ Cuando un jugador envia `action: "move"`, el servidor:
 4. Si detecta jaque mate, finaliza la partida y recalcula los ELOs de ambos jugadores.
 
 ## Screenshots
+<img width="1600" height="843" alt="WhatsApp Image 2026-08-18 at 5 03 32 PM" src="https://github.com/user-attachments/assets/7ef3949b-6c20-4e62-8fe4-ba5b1bbbd422" />
+<img width="1600" height="843" alt="WhatsApp Image 2026-08-18 at 5 04 12 PM" src="https://github.com/user-attachments/assets/c79dd106-0585-44ad-982f-014028acb158" />
+<img width="1600" height="843" alt="WhatsApp Image 2026-08-18 at 5 05 05 PM" src="https://github.com/user-attachments/assets/da055f20-d060-464e-9f43-c2cc37d90294" />
 
-> Pendiente — proxima actualizacion
+
+
+
 
 ## Autor
 
